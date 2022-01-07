@@ -1,6 +1,7 @@
 from typing import *
 from hashlib import sha1
 import time
+import json
 
 
 # UTXO set will be a hash map for quick retreival. (tx_id, UTXO)
@@ -22,15 +23,17 @@ class Transaction:
 class Block:
     # Creates a new block that is ready for the mining process.
     def __init__(self, prev_block, txs: List[Transaction], height) -> None:
-        self.prev_block = prev_block
-        self.hash = None 
+        self.prev_block = prev_block 
         self.txs = txs
         self.height = height
         self.timestamp = int(time.time())
-        self.nonce = None
+        self.nonce = 0
 
     def set_nonce(self, nonce):
         self.nonce = nonce
+
+    def to_json(self):
+        return json.dumps(self, indent = 4, default=lambda o: o.__dict__)
 
 class Mempool:
     # Mempool ordering would normally be based on tx fees but it will just be FIFO. 
