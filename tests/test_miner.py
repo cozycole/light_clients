@@ -3,12 +3,13 @@ import time
 import sys
 sys.path.insert(1, "/Users/colet/pyth_blockchain/src")
 import miner
-import wallet
 import blockchain_structs as bs
 from hashlib import sha1
 """
 This file tests functions of a miner.
 This includes finding block solutions and verifying/routing blocks and txs.
+
+### Change the sys.path to wherever the src directoy is stored on your system ###
 
 Run: python -m unittest tests/test_miner.py
 """
@@ -31,6 +32,7 @@ class TestBlockMine(unittest.TestCase):
     def test_mine_invalid_block(self):
         solution = TestBlockMine.create_mine(0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         self.assertGreater(int(sha1(solution.to_json().encode()).hexdigest(), 16), 0x00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+
 
 if __name__ == "__main__":
     unittest.main()
