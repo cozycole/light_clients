@@ -3,6 +3,7 @@ from hashlib import sha1
 from ecdsa import SigningKey, VerifyingKey, NIST192p
 import time
 import json
+import merkle
 
 
 # UTXO set will be a hash map for quick retreival. (tx_id, UTXO)
@@ -22,6 +23,9 @@ class UTXO:
 
     def set_tx_id(self, tx_hash, index):
         self.id = (tx_hash, index)
+
+    def get_hash(self):
+        return sha1(json.dumps(self, indent = 4, default=lambda o: o.__dict__)).hexdigest()
 
     def sign_utxo(self, priv_key):
         """ priv_key must be a SigningKey object"""
@@ -53,11 +57,13 @@ class Block:
     # Creates a new block that is ready for the mining process.
     def __init__(self, prev_block, txs: List[Transaction], height) -> None:
         self.block_hash = None
+        self.merkle_root = None
         self.prev_block = prev_block 
         self.txs = txs
         self.height = height
         self.timestamp = int(time.time())
         self.nonce = 0
+        self.get_merkle()
     
     def set_block_hash(self, prev_hash):
         self.block_hash = prev_hash
@@ -67,6 +73,17 @@ class Block:
 
     def to_json(self):
         return json.dumps(self, indent = 4, default=lambda o: o.__dict__)
+
+    def get_merkle(self):
+        mTree = merkle.MerkleTree()
+        for tx in self.txs:
+            mTree.addNode(tx)
+        mTree.initialize()
+        if (mTree.root == None):
+            self.merkle_root = "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b" #copying the merkle root of the bitcoin genesis
+        else:
+            self.merkle_root = mTree.root.get_value()
+
 
 
 class Blockchain:
