@@ -117,7 +117,7 @@ def generate_blockchain(block_num, coinbase, difficulty):
     first_coinbase = create_coinbase_tx(miner_pub_key, coinbase)
     disperse_cb = disperse_coinbase(address_book, first_coinbase.vout[0])
     first_tx_list = [first_coinbase, disperse_cb]
-    premine_block = bs.Block(block_chain.head.block_hash, first_tx_list, block_chain.height+1)
+    premine_block = bs.Block(block_chain.head, first_tx_list, block_chain.height+1)
     first_block = find_pow(premine_block, difficulty)
     block_chain.add_block(first_block)
     # subsequent blocks will be creating txs among addresses
@@ -126,7 +126,7 @@ def generate_blockchain(block_num, coinbase, difficulty):
         tx_list.append(create_coinbase_tx(miner_pub_key, coinbase))
         tx_list.append(disperse_coinbase(address_book, block_chain.head.txs[0].vout[0]))
         tx_list = tx_list + create_txs(block_chain.head, 2) # unpacks list returned from create_txs
-        new_block = bs.Block(block_chain.head.block_hash, tx_list , block_chain.height+1)
+        new_block = bs.Block(block_chain.head, tx_list , block_chain.height+1)
         find_pow(new_block, difficulty)
         block_chain.add_block(new_block)
     return block_chain

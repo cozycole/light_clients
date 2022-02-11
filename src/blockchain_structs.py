@@ -64,6 +64,11 @@ class Block:
         self.timestamp = int(time.time())
         self.nonce = 0
         self.get_merkle()
+        self.header = {
+            "merkle": self.merkle_root,
+            "nonce": self.nonce,
+            "timestamp": self.timestamp
+        }
     
     def set_block_hash(self, prev_hash):
         self.block_hash = prev_hash
@@ -91,6 +96,7 @@ class Blockchain:
         self.coinbase = coinbase # reward transaction to miner
         self.difficulty = difficulty
         self.chain = [] # a list of json objects (strings)
+        self.headers = []
         self.height = 0 #height discounts the genesis block
         self.head = None
 
@@ -101,6 +107,7 @@ class Blockchain:
         """
         set_utxo_txid(block.txs)
         self.chain.append(block.to_json())
+        self.headers.append(block.header)
         if block.prev_block is not None:
             self.height += 1
         self.head = block

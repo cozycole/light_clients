@@ -33,7 +33,12 @@ class MerkleTree:
     A couple things to note:
         1. The tree hashes values as they come before initialization
         2. The user must call initialize() after all nodes are appended
-        3. Hashing values together is done through calling sha1 on a concatenated string of values
+        3. Hashing values together is done in a few steps:
+                Step 1: Convert hash strings to integers
+                Step 2: Combine using bitwise OR "|"
+                Step 3: Convert back to string and hash
+            This must be done this way because hash(1,2) must be the same as hash(2,1) for the proof
+            to be accessible
         4. If a tree is odd, the last value is duplicated
         5. The tree is split to the largest 2^n<len(nodes)
 
@@ -70,11 +75,14 @@ class MerkleTree:
             return
         split_id = len(nodeSubSection) - (2**int((math.log(len(nodeSubSection),2))//1))//2 # split into largest n division of 2^n
         if len(nodeSubSection) == 2:
-            newNode = MerkleNode(sha1((nodeSubSection[0].get_value() + nodeSubSection[1].get_value()).encode()).hexdigest(), nodeSubSection[1], nodeSubSection[0], None)
+            concatenated = int(nodeSubSection[0].get_value(),16) | int(nodeSubSection[1].get_value(),16)
+            newhash = sha1(str(concatenated).encode()).hexdigest()
+            newNode = MerkleNode(newhash, nodeSubSection[1], nodeSubSection[0], None)
             return newNode
         left = self._generatetree(nodeSubSection[:split_id]) # call recursively on left "half"
         right = self._generatetree(nodeSubSection[split_id:]) # call recursively on right "half"
-        value = sha1((left.get_value() + right.get_value()).encode()).hexdigest()
+        concatenated = str(int(left.get_value(),16) | int(right.get_value(),16))
+        value = sha1(concatenated.encode()).hexdigest()
         return MerkleNode(value, right, left, None)
 
     def _set_parents(self, node):
@@ -139,14 +147,16 @@ class MerkleTree:
 if __name__ == "__main__":
     """ Used for Testing """
     mtree = MerkleTree()
-    for i in range(1,70): # Generates 70 nodes of values of single integers
+    for i in range(1,90): # Generates 70 nodes of values of single integers
         mtree.addNode(i)
     mtree.initialize()
     mtree.print_tree() # Tree information
     print("Root: "+ mtree.root.get_value()) # Root hash value
-    hashed = sha1("1".encode()).hexdigest()
-    for hash in mtree.get_path(1):
-        hashed = sha1((hashed+hash).encode()).hexdigest()
+    hashed = sha1(str(5).encode()).hexdigest()
+    for hash in mtree.get_path(5):
+        print(hash)
+        concatenated = str(int(hashed, 16) | int(hash, 16))
+        hashed = sha1(concatenated.encode()).hexdigest()
     print("Proven: " + hashed) # Hash value given from hashing together path
     # if Proven and Root give the same integer, the system works!
 
