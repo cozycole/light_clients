@@ -66,13 +66,19 @@ class MerkleTree:
         # Once all nodes are appended, run initialize
         if len(self.nodes) % 2 == 1:
             self.nodes.append(self.nodes[(len(self.nodes)-1)])
+        print("\tGenerating Merkle Tree...")
         self.root = self._generatetree(self.nodes)
         self._set_parents(self.root)
+        if self.root:
+            print("\tMerkle Tree Generated with root: {s}".format(s = self.root.get_value()))
     
     def _generatetree(self, nodeSubSection):
+        # Recursive function that generates a merkle tree given a subsection of nodes
+        # Starts with the full list of nodes, generating nodes top-down
         if len(nodeSubSection) == 0:
             # tree was initialized with no nodes
             return
+        # split_id is the point to split the subsection
         split_id = len(nodeSubSection) - (2**int((math.log(len(nodeSubSection),2))//1))//2 # split into largest n division of 2^n
         if len(nodeSubSection) == 2:
             concatenated = int(nodeSubSection[0].get_value(),16) | int(nodeSubSection[1].get_value(),16)
@@ -100,7 +106,7 @@ class MerkleTree:
         self._printRecursive(self.root)
 
     def _printRecursive(self, node):
-        # Debugging only
+        # Debugging only, prints the tree recursively
         if node != None:
             if node.parent != None:
                 print("Parent: "+str(node.parent.get_value()))
