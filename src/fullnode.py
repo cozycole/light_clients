@@ -33,3 +33,6 @@ class FullNode:
                         "path" : mtree.get_path(transaction)
                         }
             curblock = curblock.prev_block
+
+    def get_nipopow_proof():
+        pass

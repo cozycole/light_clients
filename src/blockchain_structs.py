@@ -6,6 +6,7 @@ import json
 import merkle
 
 
+
 # UTXO set will be a hash map for quick retreival. (tx_id, UTXO)
 class UTXO:
     # This is what will be used as the message for ECDSA signature (where self.sig == "").
@@ -61,17 +62,21 @@ class Block:
         self.prev_block = prev_block 
         self.txs = txs
         self.height = height
-        self.timestamp = int(time.time())
         self.nonce = 0
-        self.get_merkle()
+        self.get_merkle() # init merkle tree with block txns
+        self.interlink = None
         self.header = {
             "merkle": self.merkle_root,
             "nonce": self.nonce,
-            "timestamp": self.timestamp
+            "timestamp": int(time.time())
         }
-    
+    def __repr__(self):
+        return self.block_hash
     def set_block_hash(self, prev_hash):
         self.block_hash = prev_hash
+
+    def init_interlink(self, genesis):
+        self.interlink = nipopow.Interlink(genesis)
 
     def set_nonce(self, nonce):
         self.nonce = nonce
@@ -90,12 +95,11 @@ class Block:
             self.merkle_root = mTree.root.get_value()
 
 
-
 class Blockchain:
     def __init__(self, coinbase: int, difficulty: int) -> None:
         self.coinbase = coinbase # reward transaction to miner
         self.difficulty = difficulty
-        self.chain = [] # a list of json objects (strings)
+        self.chain = [] # a list of objects (strings)
         self.headers = []
         self.height = 0 #height discounts the genesis block
         self.head = None
@@ -106,7 +110,7 @@ class Blockchain:
         previous hash (at this point the block has been validated).
         """
         set_utxo_txid(block.txs)
-        self.chain.append(block.to_json())
+        self.chain.append(block)
         self.headers.append(block.header)
         if block.prev_block is not None:
             self.height += 1
@@ -118,3 +122,4 @@ def set_utxo_txid(tx_list: List[Transaction]):
         for i in range(len(tx.vout)):
             tx.vout[i].set_tx_id(tx.tx_id, i)
 
+import nipopow # circular import problem

@@ -1,9 +1,11 @@
+from gettext import find
 from typing import *
 import blockchain_structs as bs
 from hashlib import sha1
 from ecdsa import SigningKey, VerifyingKey, NIST192p
 import random
 import json
+import nipopow
 
 # pre-generated addresses
 # (priv, pub)
@@ -17,22 +19,24 @@ ADDRESSES = [('765353b3e107ad026219295db145cf93fc7462879b745988',
             ('d6b2189fd24fc1e19f32c2741738bb0834ac919c6ded34d7',
             '3e246fd658bb0a5feaee64f4c69adeb5d537be6b5083f20de2c06e1914ef3b09d12bca3081f02d7a69c1ca5af5892e67')]
 
-def verify_UTXO(utxo: bs.UTXO, utxo_set: List[bs.UTXO]) -> bool:
-    """
-    Checks that both the the UTXO signature is valid, and that the UTXO resides
-    in the UTXO set.
-    """
-    # First check the utxo resides in the set
-    if utxo not in utxo_set:
-        return False
-    # Second, verify if the signature is valid
-    prove_message = utxo.get_message().to_json().encode()
-    verif_key = VerifyingKey.from_string(bytearray.fromhex(utxo.pub_key), curve=NIST192p)
-    decoded_sig = bytes.fromhex(utxo.sig)
-    try:
-        return verif_key.verify(decoded_sig, prove_message)
-    except:
-        return False
+LIGHT_CLIENT_ADDRESS = None
+
+# def verify_UTXO(utxo: bs.UTXO, utxo_set: List[bs.UTXO]) -> bool:
+#     """
+#     Checks that both the the UTXO signature is valid, and that the UTXO resides
+#     in the UTXO set.
+#     """
+#     # First check the utxo resides in the set
+#     if utxo not in utxo_set:
+#         return False
+#     # Second, verify if the signature is valid
+#     prove_message = utxo.get_message().to_json().encode()
+#     verif_key = VerifyingKey.from_string(bytearray.fromhex(utxo.pub_key), curve=NIST192p)
+#     decoded_sig = bytes.fromhex(utxo.sig)
+#     try:
+#         return verif_key.verify(decoded_sig, prove_message)
+#     except:
+#         return False
 
 def find_pow(block: bs.Block, difficulty: int) -> bs.Block:
     serial_block = block.to_json().encode()
@@ -42,7 +46,7 @@ def find_pow(block: bs.Block, difficulty: int) -> bs.Block:
         serial_block = block.to_json().encode()
         pow_hash = sha1(serial_block)
     block.set_block_hash(pow_hash.hexdigest())
-    print(f"Solution found with nonce {block.nonce} with digest {pow_hash.hexdigest()}")
+    # print(f"Solution found with nonce {block.nonce} with digest {pow_hash.hexdigest()}")
     return block
 
 def get_tx_hash(tx: bs.Transaction):
@@ -99,16 +103,19 @@ def create_txs(block: bs.Block, rounds):
             utxos.remove(curr_utxo)
     return tx_list
 
-def output_blockchain(blockchain):
+def output_chain(blockchain: bs.Blockchain):
     for block in blockchain.chain:
-        print(block)
+        print(block.to_json())
+
+def output_blockhashes(blockchain: bs.Blockchain):
+    for block in blockchain.chain:
+        print(f"Block {block.height}: {block.block_hash}")
 
 def generate_blockchain(block_num, coinbase, difficulty):
     block_chain = bs.Blockchain(coinbase, difficulty)
     # create and add genesis block
     genesis = bs.Block(None, [], 0)
-    block_hash = get_block_hash(genesis)
-    genesis.set_block_hash(block_hash)
+    genesis = find_pow(genesis, difficulty)
     block_chain.add_block(genesis)
     
     miner_pub_key = MINER[1]
@@ -118,21 +125,31 @@ def generate_blockchain(block_num, coinbase, difficulty):
     disperse_cb = disperse_coinbase(address_book, first_coinbase.vout[0])
     first_tx_list = [first_coinbase, disperse_cb]
     premine_block = bs.Block(block_chain.head, first_tx_list, block_chain.height+1)
+    premine_block.interlink = nipopow.Interlink(genesis)
     first_block = find_pow(premine_block, difficulty)
     block_chain.add_block(first_block)
     # subsequent blocks will be creating txs among addresses
+    prev_block = first_block
     for i in range(block_num):
         tx_list = []
         tx_list.append(create_coinbase_tx(miner_pub_key, coinbase))
         tx_list.append(disperse_coinbase(address_book, block_chain.head.txs[0].vout[0]))
         tx_list = tx_list + create_txs(block_chain.head, 2) # unpacks list returned from create_txs
         new_block = bs.Block(block_chain.head, tx_list , block_chain.height+1)
-        find_pow(new_block, difficulty)
+        new_block.interlink = nipopow.Interlink(genesis)
+        new_block.interlink.update_interlink(prev_block, difficulty)
+        new_block = find_pow(new_block, difficulty)
         block_chain.add_block(new_block)
+        prev_block = new_block
     return block_chain
 
 if __name__ == "__main__":
     # generate chain with 5 blocks, block rewards of 25 and given pow difficulty
     # 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF hex for 1/16^4 chance of finding pow solution
-    chain = generate_blockchain(1, 25, 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
-    output_blockchain(chain)
+    chain = generate_blockchain(20, 25, 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+    # output_chain(chain)
+    # output_blockhashes(chain)
+    nipopow.output_interlinks(chain)
+    print(nipopow.find_top_chain(chain, 3, 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF))
+    print("Super Block Distribution:", nipopow.get_super_dist(chain, 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF))
+    nipopow.suffix_proof(chain, 3, 3, 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
