@@ -25,7 +25,7 @@ class FullNode:
             # Moving backwards through the blockchain
             for block_transaction in curblock.txs:
                 if block_transaction.tx_id == tid:
-                    print("\n|Full Node|\n\tTransaction {t} found in block {b}".format(t=tid, b = curblock.merkle_root))
+                    print("\n|Full Node|\n\tTransaction {t} found in block {b}".format(t=tid, b = curblock.height))
                     mtree = MerkleTree()
                     for tx in curblock.txs:
                         mtree.addNode(tx.tx_id)  # Fill the merkle tree
