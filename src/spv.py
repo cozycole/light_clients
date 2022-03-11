@@ -52,8 +52,12 @@ if __name__ == "__main__":
     fn = FullNode(chain)
     wallet = SPV(fn, chain.headers)
     valid_transaction = chain.head.prev_block.txs[2].tx_id
+    print("---------------------------------------------------------------------")
+    print("Blockchain Generated,")
+    print("To view a list of transactions in the blockchain, type 'l' or 'LIST'")
+    print("---------------------------------------------------------------------\n")
     while(True):
-        x=input('Enter Transaction to be verified by SPV, enter "HELP" for help:\n$\t')
+        x=input('Enter Transaction to be verified by SPV, enter "HELP" for help, or "QUIT" to exit:\n$\t')
         if x == "EXIT" or x == "QUIT" or x == "q" or x == "quit":
             break
         elif x == "LIST" or x == "l":

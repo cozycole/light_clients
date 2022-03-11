@@ -44,7 +44,8 @@ class FullNode:
         i = self.blockchain.height
         curblock = self.blockchain.head
         while curblock != None:
-            print("{Block "+str(i)+":")
+            print("Block "+str(i)+":")
+            print("\t{")
             for tx in curblock.txs:
                 print("\t"+str(tx.tx_id))
             print("\t\t\t\t\t\t}")
