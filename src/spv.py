@@ -65,6 +65,8 @@ if __name__ == "__main__":
             break
         elif x == "LIST" or x == "l":
             fn.print_blockchain_transactions()
+        elif x == "STORE" or x == "s":
+            fn.store_blockchain_transactions("blockchain.txt")
         elif x == "HELP" or x == "h":
             print("---------------------------------------------------------------------")
             print("\t\tSimple Payment Verification Simulation\n")
@@ -78,7 +80,8 @@ if __name__ == "__main__":
             print("Commands:")
             print("\n\t'HELP'/'h':\n\t\t- Brings up the help screen")
             print("\n\t'LIST'/'l':\n\t\t- Lists all blocks and their transaction IDs")
-            print("\n\t'QUIT'/'q':\n\t\t- Closes the program\n")
+            print("\n\t'QUIT'/'q':\n\t\t- Closes the program")
+            print("\n\t'STORE'/'s':\n\t\t-Store the blockchain in a file titled 'blockchain.txt\n'")
             print("---------------------------------------------------------------------\n")
         else:
             wallet.verify_transaction(x)

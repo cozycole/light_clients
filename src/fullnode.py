@@ -41,14 +41,30 @@ class FullNode:
     
     def print_blockchain_transactions(self):
         # Prints the current block chain, for use in testing systems
-        i = self.blockchain.height
         curblock = self.blockchain.head
         while curblock != None:
-            print("Block "+str(i)+":")
+            print("Block "+str(curblock.height)+":")
             print("\t{")
             for tx in curblock.txs:
                 print("\t"+str(tx.tx_id))
             print("\t\t\t\t\t\t}")
             curblock = curblock.prev_block
-            i -= 1
+
+    def store_blockchain_transactions(self, filename: str):
+        # Writes blockchain to file at "Filename"
+        curblock = self.blockchain.head
+        fp = open(filename, "w")
+        if not fp:
+            print("Could not write to file")
+            return None
+        while curblock != None:
+            fp.write("\nBlock "+str(curblock.height)+":\n")
+            fp.write("\tTimestamp: {ts}\n".format(ts=curblock.timestamp))
+            fp.write("\tNonce: {nn}\n".format(nn=curblock.nonce))
+            fp.write("\tMerkle Root: {mr}\n".format(mr=curblock.merkle_root))
+            fp.write("\tTransactions \n\t{\n")
+            for tx in curblock.txs:
+                fp.write("\t"+str(tx.tx_id)+"\n")
+            fp.write("\t}\n\n")
+            curblock = curblock.prev_block
 
