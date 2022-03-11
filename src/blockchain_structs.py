@@ -87,7 +87,8 @@ class Block:
     def get_merkle(self):
         mTree = merkle.MerkleTree()
         for tx in self.txs:
-            mTree.addNode(tx)
+            mTree.addNode(tx.tx_id)
+        print("\n|Block Chain|")
         mTree.initialize()
         if (mTree.root == None):
             self.merkle_root = "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b" #copying the merkle root of the bitcoin genesis
