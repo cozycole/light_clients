@@ -62,9 +62,9 @@ class FullNode:
             return None
         while curblock != None:
             fp.write("\nBlock "+str(curblock.height)+":\n")
-            fp.write("\tTimestamp: {ts}\n".format(ts=curblock.timestamp))
+            fp.write("\tTimestamp: {ts}\n".format(ts=curblock.header['timestamp']))
             fp.write("\tNonce: {nn}\n".format(nn=curblock.nonce))
-            fp.write("\tMerkle Root: {mr}\n".format(mr=curblock.merkle_root))
+            fp.write("\tMerkle Root: {mr}\n".format(mr=curblock.header['merkle']))
             fp.write("\tTransactions \n\t{\n")
             for tx in curblock.txs:
                 fp.write("\t"+str(tx.tx_id)+"\n")
