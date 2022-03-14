@@ -48,6 +48,7 @@ class Transaction:
         self.tx_id = None
         self.vin = vin
         self.vout = vout
+        self.timestamp = int(time.time_ns())
     
     def set_tx_id(self):
         self.tx_id = sha1(json.dumps(self, indent = 4, default=lambda o: o.__dict__).encode()).hexdigest()
@@ -70,8 +71,10 @@ class Block:
             "nonce": self.nonce,
             "timestamp": int(time.time())
         }
-    def __repr__(self):
+    
+    def __repr__(self) -> str:
         return self.block_hash
+
     def set_block_hash(self, prev_hash):
         self.block_hash = prev_hash
 
@@ -100,7 +103,7 @@ class Blockchain:
     def __init__(self, coinbase: int, difficulty: int) -> None:
         self.coinbase = coinbase # reward transaction to miner
         self.difficulty = difficulty
-        self.chain = [] # a list of objects (strings)
+        self.chain = [] # a list of Block objects
         self.headers = []
         self.height = 0 #height discounts the genesis block
         self.head = None

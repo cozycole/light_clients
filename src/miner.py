@@ -46,8 +46,8 @@ def find_pow(block: bs.Block, difficulty: int) -> bs.Block:
         serial_block = block.to_json().encode()
         pow_hash = sha1(serial_block)
     block.set_block_hash(pow_hash.hexdigest())
-    print("\n|Miner|")
-    print(f"\tSolution found with nonce {block.nonce} with digest {pow_hash.hexdigest()}\n")
+    # print("\n|Miner|")
+    # print(f"\tSolution found with nonce {block.nonce} with digest {pow_hash.hexdigest()}\n")
     return block
 
 def get_tx_hash(tx: bs.Transaction):
@@ -135,8 +135,9 @@ def generate_blockchain(block_num, coinbase, difficulty):
         tx_list = []
         tx_list.append(create_coinbase_tx(miner_pub_key, coinbase))
         tx_list.append(disperse_coinbase(address_book, block_chain.head.txs[0].vout[0]))
-        tx_list = tx_list + create_txs(block_chain.head, 18) # unpacks list returned from create_txs
+        tx_list = tx_list + create_txs(block_chain.head, 10) # unpacks list returned from create_txs
         new_block = bs.Block(block_chain.head, tx_list , block_chain.height+1)
+        print("TXN NUM:", len(new_block.txs))
         new_block.interlink = nipopow.Interlink(genesis)
         new_block.interlink.update_interlink(prev_block, difficulty)
         new_block = find_pow(new_block, difficulty)
