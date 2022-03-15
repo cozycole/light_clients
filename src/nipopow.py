@@ -1,4 +1,3 @@
-from math import dist
 from typing import *
 import blockchain_structs
 import copy
@@ -329,7 +328,7 @@ def output_blockhashes(blockchain, difficulty):
 
 if __name__ == "__main__":
     # testing
-    difficulty = 0x5FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    difficulty = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
     chain = miner.generate_blockchain(100, 25, difficulty)
     k = 2
     m = 3
