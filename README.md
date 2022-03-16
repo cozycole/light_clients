@@ -4,6 +4,16 @@ A basic simulation of light-client and full node interactions on the blockchain 
 
 ## Installation
 
+1. enter "git clone https://github.com/cozycole/light_clients.git"
+
+2. enter "pip install -r requirements.txt"
+
+- To run SPV simulation:
+    - python3 spv.py 
+
+- To run NiPoPow simulation:
+    - python3 nipopow_client.py
+
 ## Simulation Interaction
 
 To run the Simple Payment Verfication Simulation, enter "python3 spv.py" in the command line. 
@@ -26,11 +36,11 @@ transactions.  These simulations run on the command line and take user input to 
 4. 'STORE'/'s': Store the blockchain in a file titled 'blockchain.txt
 5. 'HEADER'/'head': Prints stored headers within the NiPoPow Client
 
-## Implementation
+# Implementation
 
-### **miner.py**
+## **miner.py**
 
-### **fullnode.py**
+## **fullnode.py**
 Full Node is a python class that takes one argument of type Blockchain.  It holds four methods:
 - **get_path(tid) -> {blockid, merkle path}:**
     - The get_path method is called by the SPV module, and searches the blockchain for a transaction with ID = tid.  If the transaction is found, calls are made to the Merkle Tree Generator module to generate a tree from all of the transactions in the block containing tid.  Full node then returns a dictionary containing the Merkle Path from the transaction to the root of the block to the SPV, as well as the id of the block.
@@ -40,7 +50,7 @@ Full Node is a python class that takes one argument of type Blockchain.  It hold
 - **store_blockchain_transactions(filename):**
 	- Stores information about the blockchain in “filename”, called by the SPV.
 
-### **merkle.py**
+## **merkle.py**
 The Merkle Tree Generator module is a Python Class that generates a merkle tree from an array of string values.  Nodes are added through repeated calls to the add_node() method.  Nodes have left, right, and parent values, as well as attributes that keep track of their hash value and content.  
 - **addnode(nodeValue -> String)**: 
     - Appends nodeValue to self.node
@@ -57,7 +67,7 @@ The Merkle Tree Generator module is a Python Class that generates a merkle tree 
 - **get_path(node) -> [String]:**
 	- Returns a path from “node” to the root of the tree.
 
-### spv.py
+## **spv.py**
 
 #### **1.SPV Class:**
 The SPV Class is a Python class that represents the SPV light client.  It holds an instance of the Full Node, which in a real cryptocurrency environment would be communicated with via a network connection. It also holds an array containing all of the headers in the blockchain.  It has one method:

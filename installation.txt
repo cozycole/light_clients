@@ -7,7 +7,7 @@ pip install -r requirements.txt
 cd src
 
 To run SPV simulation:
-python spv.py 
+python3 spv.py 
 
 To run NiPoPow simulation:
-python nipopow_client.py
+python3 nipopow_client.py
