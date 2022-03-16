@@ -30,7 +30,7 @@ class SPV:
         print("\tFollowing path for proof...")
         for hash in fullnodeinfo["path"]:
             # loops through all hashes in the path and hashes them together for verification
-            concatenated = str(int(hashed, 16) | int(hash, 16))
+            concatenated = str(int(hashed, 16) + int(hash, 16))
             hashed = sha1(concatenated.encode()).hexdigest()
         # At this point if "hashed" == Merkle Root of a block, the transaction is verified
         if self.headers[fullnodeinfo["blockid"]]["merkle"] == hashed:
