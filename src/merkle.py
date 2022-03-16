@@ -6,7 +6,7 @@ A dynamic Merkle Tree class and Node class to be used with any node values.
 Must be initialized before use with initialize(), used in blockchain.py to generate merkle roots
 for each block, and fullnode.py to return a path to the lightclient.
 
-
+Used for reference: https://onuratakan.medium.com/what-is-the-merkle-tree-with-python-example-cbb4513b8ad0+
 """
 
 from hashlib import sha1
@@ -76,6 +76,7 @@ class MerkleTree:
     def _generatetree(self, nodeSubSection):
         # Recursive function that generates a merkle tree given a subsection of nodes
         # Starts with the full list of nodes, generating nodes top-down
+        # Based loosely on the implementation by https://onuratakan.medium.com/what-is-the-merkle-tree-with-python-example-cbb4513b8ad0
         if len(nodeSubSection) == 0:
             # tree was initialized with no nodes
             return
@@ -93,7 +94,7 @@ class MerkleTree:
         return MerkleNode(value, right, left, None)
 
     def _set_parents(self, node):
-    # recursive function to set the parent of all node
+    # recursive function to set the parent of all nodes
         if node != None:
             if node.leftNode != None:
                 node.leftNode.set_parent(node)
