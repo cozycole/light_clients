@@ -77,9 +77,9 @@ The SPV Class is a Python class that represents the SPV light client.  It holds 
 #### **2.Simulation()**
 The simulation method is called when the user runs “spv.py” and runs a command line interface that allows users to generate and interact with a simulated blockchain by verifying transactions via the SPV method. 
 
-#### **NiPoPow Implementation Code - nipopow.py and nipopow_client.py**
+## **NiPoPow Implementation Code - nipopow.py and nipopow_client.py**
 The module nipopow.py has all the necessary functions to create and verify nipopow proofs and nipopow_client.py calls these functions in the context of a simulation just like spv.py. All the following algorithms are based on algorithms outlined in [2]. 
-**Interlink Class:**
+#### **Interlink Class:**
 - An instance of this class is held in every block, and contains a list of block objects (which function like pointers). It has the following function:
 - **update_interlink(last_block, difficulty) -> None**
 	- This function copies the last block's interlink and then modifies it based on the superblock level of the previous block. 
