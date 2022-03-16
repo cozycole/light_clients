@@ -61,7 +61,7 @@ if __name__ == '__main__':
             wallet.print_superchain()
         elif x == "HELP" or x == "h":
             print("---------------------------------------------------------------------")
-            print("\t\tSimple Payment Verification Simulation\n")
+            print("\t\tNiPoPow Verification Simulation\n")
             print("This system is meant to simulate the interaction between a light client and")
             print("a full node on a client.  On startup, a blockchain is generated with your")
             print("specifications. Once the blockchain is generated, simply enter a")
