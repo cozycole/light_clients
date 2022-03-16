@@ -30,7 +30,7 @@ class SPV:
         print("\tFollowing path for proof...")
         for hash in fullnodeinfo["path"]:
             # loops through all hashes in the path and hashes them together for verification
-            concatenated = str(int(hashed, 16) | int(hash, 16))
+            concatenated = str(int(hashed, 16) + int(hash, 16))
             hashed = sha1(concatenated.encode()).hexdigest()
         # At this point if "hashed" == Merkle Root of a block, the transaction is verified
         if self.headers[fullnodeinfo["blockid"]]["merkle"] == hashed:
@@ -40,8 +40,9 @@ class SPV:
         else:
             print("\tPath lead to incorrect root value:\n\tGiven: "+ str(hashed) + ", Actual: " + str(self.headers[fullnodeinfo["blockid"]]["merkle"]))
 
-if __name__ == "__main__":
-    """ Simple Test implementation of the System"""
+
+def simulation():
+    """ The System to be run when user runs SPV.py"""
     print("\n---------------------------------------------------------------------")
     print("Simple Payment Verification Simulation")
     print("---------------------------------------------------------------------\n")
@@ -85,4 +86,5 @@ if __name__ == "__main__":
             print("---------------------------------------------------------------------\n")
         else:
             wallet.verify_transaction(x)
-
+if __name__ == "__main__":
+    simulation()

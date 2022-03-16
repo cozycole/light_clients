@@ -1,4 +1,3 @@
-from math import dist
 from typing import *
 import blockchain_structs
 import copy
@@ -179,27 +178,22 @@ def suffix_proof(blockchain: blockchain_structs.Blockchain, k: int, m: int, diff
     # simply return the last k blocks as these are waiting to be confirmed (for BTC k = 6)
     suffix = blockchain.chain[-k:]
     
-    print("PREFIX:",prefix)
-    print(f"SUFFIX{suffix} of {k} blocks",)
+    # print("PREFIX:",prefix)
+    # print(f"SUFFIX{suffix} of {k} blocks",)
     prefix.append(suffix)
     return [prefix, get_extra_sblocks(blockchain, m, k, difficulty)]
 
 def infix_proof(blockchain: blockchain_structs.Blockchain, k: int, m: int, difficulty: int, txn_hash: str):
     # find block with transaction
     predicate_block = find_txn_block(blockchain, txn_hash)
-    print(f"txn found in block {predicate_block.height}")
+    # print(f"txn found in block {predicate_block.height}")
     if predicate_block:
         # print("BLOCK FOUND:", predicate_block)
         # find suffix proof which gives the scaffolding for the proof 
         proof_blocks = suffix_proof(blockchain, k, m, difficulty)
-
-        print("CHAIN REAAAALY BEFORE LOOOOOK:", proof_blocks)
         chain = proof_blocks[0].copy()
-        print("CHAIN BEFORE LOOOOOK:", chain)
         if proof_blocks[1]:
-            print("appended new blocks")
             chain.append(proof_blocks[1])
-        print("CHAIN AFTER LOOOOOK:", chain)
         chain = chain_from_proof(chain)
         # print("PRE FOLLOW DOWN:", [block.height for block in chain])
         if predicate_block not in chain:
@@ -263,7 +257,6 @@ def verify_suffix(proof_blocks: List[blockchain_structs.Block], stored_superchai
         return False
     
     chain = proof_blocks[0]
-    print("PROOF BLOCKS",proof_blocks)
     if proof_blocks[1]:
         chain.append(proof_blocks[1])
     chain = chain_from_proof(chain)
@@ -272,7 +265,7 @@ def verify_suffix(proof_blocks: List[blockchain_structs.Block], stored_superchai
 def validate_chain(chain: List[blockchain_structs.Block], genesis: blockchain_structs.Block, superchain: List[blockchain_structs.Block]):
     if chain[-1] != genesis:
         chain.append(genesis)
-    print("VALIDATING CHAIN:", [block.height for block in chain])
+    # print("VALIDATING CHAIN:", [block.height for block in chain])
     for i in range(len(chain)):
         # if at end of the list
         if chain[i+1] == genesis:
@@ -291,7 +284,6 @@ def validate_chain(chain: List[blockchain_structs.Block], genesis: blockchain_st
         if chain[i].interlink.interlink[-1] != genesis.block_hash:
             print(f"Verification Error: Block with hash {chain[i]} is not chained to genesis")
             return False
-    print("VALID CHAIN")
     return True
 
 def chain_from_proof(proof: List[List[blockchain_structs.Block]]) -> List[blockchain_structs.Block]:
@@ -310,7 +302,7 @@ def chain_from_proof(proof: List[List[blockchain_structs.Block]]) -> List[blockc
     # print([block.height for block in ordered_chain])
     return ordered_chain
 
-def verify_infix(proof: List[List[blockchain_structs.Block]], stored_superchain, k: int, genesis: blockchain_structs.Block, m: int):
+def verify_infix(proof: List[List[blockchain_structs.Block]], stored_superchain, k: int, genesis: blockchain_structs.Block, txn_hash: str):
     """
     Verifier demands an m-level for a proof (higher m, higher confidence, higher proof size (still log)) 
     that means that each superblock level must have at least m blocks in the chain (this prevents a bad actor
@@ -325,11 +317,21 @@ def verify_infix(proof: List[List[blockchain_structs.Block]], stored_superchain,
     -If all pass, this proof (chain) becomes the one you accept.
     Returns the predicate of the suffix. 
     """
+    # if len(proof[:-1][-1] != k:
+    #     suffix_modifier = -2
     if verify_suffix(proof[:-1], stored_superchain, k, genesis, stored_superchain):
-        print("Valid suffix proof")
-        print("Verifying infix proof")
+        # print("Valid suffix proof")
+        # print("PREFIX CHAIN: ", proof[:-1][:-1])
+        # print("SUFFIX CHAIN: ", proof[:-1][-1])
+        # print("Verifying infix proof")
+        print("Proof length",len(proof))
         if validate_chain(proof[-1], genesis, stored_superchain):
-            print("Valid Infix Proof")
+            print(f"Transaction with hash {txn_hash} exists in the chain")
+            print("NiPoPow Proof Information")
+            print("==========================")
+            print("PREFIX CHAIN: ", proof[0][:-2])
+            print(f"SUFFIX CHAIN: {proof[0][-2]} of k = {k} blocks")
+            print("FINAL BLOCK SET PROOF:", [block.height for block in proof[-1]])
             return True
         else:
             print("Verification Error: Invalid infix proof")

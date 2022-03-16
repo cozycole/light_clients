@@ -10,12 +10,17 @@ Holds the current blockchain as well as a method to verify transactions
 """
 import blockchain_structs as bs
 from merkle import MerkleTree
-from nipopow import *
+import nipopow
+from typing import *
 
 
 class FullNode:
     def __init__(self, blockchain: bs.Blockchain) -> None:
         self.blockchain = blockchain
+        self.difficulty = None
+
+    def set_difficulty(self, difficulty: int):
+        self.difficulty = difficulty
     
     def get_path(self, tid: str):
         # Returns a dictionary with key pairs,
@@ -40,12 +45,15 @@ class FullNode:
                             }
             curblock = curblock.prev_block
     
-    def get_nipopow_proof():
-        pass
+    def get_nipopow_proof(self, k, m, txn):
+        if not nipopow.find_txn_block(self.blockchain, txn):
+            print(f"Transaction {txn} not found!")
+            return False
+        return nipopow.infix_proof(self.blockchain, k, m, self.difficulty, txn)
 
-    def get_top_chain():
-        pass
-    
+    def get_top_chain(self, m: int, k: int, difficulty: int):
+        return nipopow.get_superchain(self.blockchain.chain, nipopow.find_top_chain(self.blockchain, m, difficulty, k), difficulty, k)
+
     def print_blockchain_transactions(self):
         # Prints the current block chain, for use in testing systems
         curblock = self.blockchain.head
@@ -66,9 +74,9 @@ class FullNode:
             return None
         while curblock != None:
             fp.write("\nBlock "+str(curblock.height)+":\n")
-            fp.write("\tTimestamp: {ts}\n".format(ts=curblock.timestamp))
+            fp.write("\tTimestamp: {ts}\n".format(ts=curblock.header['timestamp']))
             fp.write("\tNonce: {nn}\n".format(nn=curblock.nonce))
-            fp.write("\tMerkle Root: {mr}\n".format(mr=curblock.merkle_root))
+            fp.write("\tMerkle Root: {mr}\n".format(mr=curblock.header['merkle']))
             fp.write("\tTransactions \n\t{\n")
             for tx in curblock.txs:
                 fp.write("\t"+str(tx.tx_id)+"\n")

@@ -21,6 +21,7 @@ class MerkleNode:
         self.parent = None
 
     def set_parent(self, parentNode):
+        # sets a node parent, after tree is generated
         self.parent = parentNode
 
     def get_value(self):
@@ -81,13 +82,13 @@ class MerkleTree:
         # split_id is the point to split the subsection
         split_id = len(nodeSubSection) - (2**int((math.log(len(nodeSubSection),2))//1))//2 # split into largest n division of 2^n
         if len(nodeSubSection) == 2:
-            concatenated = int(nodeSubSection[0].get_value(),16) | int(nodeSubSection[1].get_value(),16)
+            concatenated = int(nodeSubSection[0].get_value(),16) + int(nodeSubSection[1].get_value(),16)
             newhash = sha1(str(concatenated).encode()).hexdigest()
             newNode = MerkleNode(newhash, nodeSubSection[1], nodeSubSection[0], None)
             return newNode
         left = self._generatetree(nodeSubSection[:split_id]) # call recursively on left "half"
         right = self._generatetree(nodeSubSection[split_id:]) # call recursively on right "half"
-        concatenated = str(int(left.get_value(),16) | int(right.get_value(),16))
+        concatenated = str(int(left.get_value(),16) + int(right.get_value(),16))
         value = sha1(concatenated.encode()).hexdigest()
         return MerkleNode(value, right, left, None)
 
@@ -135,10 +136,10 @@ class MerkleTree:
 
     def get_path(self, value):
         # Returns an array of all strings to be hashed with initial value to get to the root
-        valueNode = None
-        returnstrings = []
+        valueNode = None # Identifies the node that contains the content == value
+        returnstrings = [] # Merkle path
         for node in self.nodes:
-            if node.content == value:
+            if node.content == value:  # Found a node with matching value
                 valueNode = node
         if valueNode == None:
             if len(self.nodes) == 0:
@@ -161,7 +162,7 @@ if __name__ == "__main__":
     hashed = sha1(str(5).encode()).hexdigest()
     for hash in mtree.get_path(5):
         print(hash)
-        concatenated = str(int(hashed, 16) | int(hash, 16))
+        concatenated = str(int(hashed, 16) + int(hash, 16))
         hashed = sha1(concatenated.encode()).hexdigest()
     print("Proven: " + hashed) # Hash value given from hashing together path
     # if Proven and Root give the same integer, the system works!

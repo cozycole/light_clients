@@ -1,38 +1,56 @@
-from nipopow import *
+import nipopow
 from miner import generate_blockchain
 from fullnode import FullNode
 
 class NiPoPow_Client:
-    def __init__(self, superchain, fullnode: FullNode):
-        self.superchain = superchain
+    def __init__(self, fullnode: FullNode):
+        self.superchain = None
+        self.genesis = None
         self.fullnode = fullnode
         self.m = 3
         self.k = 3
 
     def print_superchain(self):
         print("Stored headers:",self.superchain)
+
+    def set_superchain(self, superchain):
+        self.superchain = superchain
+
+    def set_genesis(self, genesis):
+        self.genesis = genesis
     
+    def verify_transaction(self, txn: str):
+        proof = self.fullnode.get_nipopow_proof(self.k, self.m, txn)
+        if not proof:
+            return False
+        nipopow.verify_infix(proof, self.superchain, self.k, self.genesis, txn)
+
 if __name__ == '__main__':
     """ Simple Test implementation of the System"""
     print("\n---------------------------------------------------------------------")
-    print("Simple Payment Verification Simulation")
+    print("Non Interactive Proof of Proof of Work Client Simulation")
     print("---------------------------------------------------------------------\n")
     blocklen=input("How many blocks would you like the blockchain to contain:\n$\t")
+    difficulty = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
     try:
-        chain = generate_blockchain(int(blocklen.strip()), 25, 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+        chain = generate_blockchain(int(blocklen.strip()), 25, difficulty)
     except:
         print("Could not read block number... generating chain of 25 blocks")
-        chain = generate_blockchain(25, 25, 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+        chain = generate_blockchain(25, 25, difficulty)
     fn = FullNode(chain)
-    wallet = NiPoPow_Client()
-    valid_transaction = chain.head.prev_block.txs[2].tx_id
+    fn.set_difficulty(difficulty)
+    wallet = NiPoPow_Client(fn)
+    super_chain = fn.get_top_chain(wallet.m, wallet.k, difficulty)
+    wallet.set_superchain(super_chain)
+    wallet.set_genesis(chain.chain[0])
     print("---------------------------------------------------------------------")
     print("Blockchain Generated,")
     print("To view a list of transactions in the blockchain, type 'l' or 'LIST'")
     print("---------------------------------------------------------------------\n")
+    print("NIPOPOW STORED SUPERCHAIN:", super_chain)
+    print("---------------------------------------------------------------------\n")
     while(True):
-        x=input('Enter Transaction to be verified by SPV, enter "HELP" for help, or "QUIT" to exit:\n$\t')
-        x = x.upper()
+        x=input('Enter Transaction to be verified by NiPoPow client, enter "HELP" for help, or "QUIT" to exit:\n$\t')
         if x == "EXIT" or x == "QUIT" or x == "q" or x == "quit":
             break
         elif x == "LIST" or x == "l":
