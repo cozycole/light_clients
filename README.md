@@ -76,3 +76,14 @@ The SPV Class is a Python class that represents the SPV light client.  It holds 
     If the resulting value is the same as the value of the merkle root at headers[blockid], the transaction is verified and the method returns true, if not the method returns false.
 #### **2.Simulation()**
 The simulation method is called when the user runs “spv.py” and runs a command line interface that allows users to generate and interact with a simulated blockchain by verifying transactions via the SPV method. 
+
+#### **NiPoPow Implementation Code - nipopow.py and nipopow_client.py**
+The module nipopow.py has all the necessary functions to create and verify nipopow proofs and nipopow_client.py calls these functions in the context of a simulation just like spv.py. All the following algorithms are based on algorithms outlined in [2]. 
+**Interlink Class:**
+- An instance of this class is held in every block, and contains a list of block objects (which function like pointers). It has the following function:
+- **update_interlink(last_block, difficulty) -> None**
+	- This function copies the last block's interlink and then modifies it based on the superblock level of the previous block. 
+- **suffix_proof(blockchain, k, m , difficulty) -> List of blocks**
+	- This function  produces the suffix proof outlined in section 3.4. It simply takes the last k blocks and gets the last m blocks of the superchains leading up to the top level superchain where len(top + 1) < m.
+- **infix_proof(blockchain, k, m, difficulty, txn_hash) -> List of blocks**
+	-This function finds the predicate block with a certain txn_hash and adds the necessary blocks to the proof to connect the predicate block and make a valid chain. This algorithm does much less than the one stated below since it only finds one predicate at a time, and it does not compare competing proofs.
