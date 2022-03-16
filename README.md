@@ -4,6 +4,18 @@ A basic simulation of light-client and full node interactions on the blockchain 
 
 ## Installation
 
+To run our simulation, follow these instructions:
+
+pip install -r requirements.txt
+
+cd src
+
+To run SPV simulation:
+python spv.py 
+
+To run NiPoPow simulation:
+python nipopow_client.py
+
 ## Simulation Interaction
 
 To run the Simple Payment Verfication Simulation, enter "python3 spv.py" in the command line. 
