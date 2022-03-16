@@ -100,28 +100,6 @@ class MerkleTree:
                 node.rightNode.set_parent(node)
                 self._set_parents(node.leftNode)
                 self._set_parents(node.rightNode)
-        
-
-    def print_tree(self):
-        # For debugging only
-        self._printRecursive(self.root)
-
-    def _printRecursive(self, node):
-        # Debugging only, prints the tree recursively
-        if node != None:
-            if node.parent != None:
-                print("Parent: "+str(node.parent.get_value()))
-            else:
-                print("Root")
-            if node.leftNode != None:
-                print("Left: "+str(node.leftNode.content)+ ", " +str(node.leftNode.value))
-                print("Right: "+ str(node.rightNode.content)+ ", " +str(node.rightNode.value))
-            else:
-                print("Leaf " + str(node.content))
-            print("Hash: "+ node.value)
-            print("")
-            self._printRecursive(node.leftNode)
-            self._printRecursive(node.rightNode)
 
     def _get_sibling(self, node):
         # Returns the node's sibling (parents other child)
@@ -157,7 +135,6 @@ if __name__ == "__main__":
     for i in range(1,90): # Generates 70 nodes of values of single integers
         mtree.addNode(i)
     mtree.initialize()
-    mtree.print_tree() # Tree information
     print("Root: "+ mtree.root.get_value()) # Root hash value
     hashed = sha1(str(5).encode()).hexdigest()
     for hash in mtree.get_path(5):
