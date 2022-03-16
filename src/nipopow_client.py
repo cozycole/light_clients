@@ -77,4 +77,4 @@ if __name__ == '__main__':
             print("\n\t'HEADER'/'head':\n\t\t- Prints stored headers within the NiPoPow Client")
             print("---------------------------------------------------------------------\n")
         else:
-            wallet.verify_transaction(x)
+            wallet.verify_transaction(x.strip())
