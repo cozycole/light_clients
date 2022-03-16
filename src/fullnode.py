@@ -10,6 +10,7 @@ Holds the current blockchain as well as a method to verify transactions
 """
 import blockchain_structs as bs
 from merkle import MerkleTree
+from nipopow import *
 
 
 class FullNode:
@@ -38,8 +39,11 @@ class FullNode:
                             "path" : mpath
                             }
             curblock = curblock.prev_block
-
+    
     def get_nipopow_proof():
+        pass
+
+    def get_top_chain():
         pass
     
     def print_blockchain_transactions(self):
