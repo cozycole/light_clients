@@ -6,7 +6,7 @@ A dynamic Merkle Tree class and Node class to be used with any node values.
 Must be initialized before use with initialize(), used in blockchain.py to generate merkle roots
 for each block, and fullnode.py to return a path to the lightclient.
 
-
+Used for reference: https://onuratakan.medium.com/what-is-the-merkle-tree-with-python-example-cbb4513b8ad0+
 """
 
 from hashlib import sha1
@@ -76,6 +76,7 @@ class MerkleTree:
     def _generatetree(self, nodeSubSection):
         # Recursive function that generates a merkle tree given a subsection of nodes
         # Starts with the full list of nodes, generating nodes top-down
+        # Based loosely on the implementation by https://onuratakan.medium.com/what-is-the-merkle-tree-with-python-example-cbb4513b8ad0
         if len(nodeSubSection) == 0:
             # tree was initialized with no nodes
             return
@@ -93,35 +94,13 @@ class MerkleTree:
         return MerkleNode(value, right, left, None)
 
     def _set_parents(self, node):
-    # recursive function to set the parent of all node
+    # recursive function to set the parent of all nodes
         if node != None:
             if node.leftNode != None:
                 node.leftNode.set_parent(node)
                 node.rightNode.set_parent(node)
                 self._set_parents(node.leftNode)
                 self._set_parents(node.rightNode)
-        
-
-    def print_tree(self):
-        # For debugging only
-        self._printRecursive(self.root)
-
-    def _printRecursive(self, node):
-        # Debugging only, prints the tree recursively
-        if node != None:
-            if node.parent != None:
-                print("Parent: "+str(node.parent.get_value()))
-            else:
-                print("Root")
-            if node.leftNode != None:
-                print("Left: "+str(node.leftNode.content)+ ", " +str(node.leftNode.value))
-                print("Right: "+ str(node.rightNode.content)+ ", " +str(node.rightNode.value))
-            else:
-                print("Leaf " + str(node.content))
-            print("Hash: "+ node.value)
-            print("")
-            self._printRecursive(node.leftNode)
-            self._printRecursive(node.rightNode)
 
     def _get_sibling(self, node):
         # Returns the node's sibling (parents other child)
@@ -157,7 +136,6 @@ if __name__ == "__main__":
     for i in range(1,90): # Generates 70 nodes of values of single integers
         mtree.addNode(i)
     mtree.initialize()
-    mtree.print_tree() # Tree information
     print("Root: "+ mtree.root.get_value()) # Root hash value
     hashed = sha1(str(5).encode()).hexdigest()
     for hash in mtree.get_path(5):
