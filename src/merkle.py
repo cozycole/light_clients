@@ -77,6 +77,7 @@ class MerkleTree:
         # Recursive function that generates a merkle tree given a subsection of nodes
         # Starts with the full list of nodes, generating nodes top-down
         # Based loosely on the implementation by https://onuratakan.medium.com/what-is-the-merkle-tree-with-python-example-cbb4513b8ad0
+
         if len(nodeSubSection) == 0:
             # tree was initialized with no nodes
             return
