@@ -40,8 +40,9 @@ class SPV:
         else:
             print("\tPath lead to incorrect root value:\n\tGiven: "+ str(hashed) + ", Actual: " + str(self.headers[fullnodeinfo["blockid"]]["merkle"]))
 
-if __name__ == "__main__":
-    """ Simple Test implementation of the System"""
+
+def simulation():
+    """ The System to be run when user runs SPV.py"""
     print("\n---------------------------------------------------------------------")
     print("Simple Payment Verification Simulation")
     print("---------------------------------------------------------------------\n")
@@ -85,4 +86,5 @@ if __name__ == "__main__":
             print("---------------------------------------------------------------------\n")
         else:
             wallet.verify_transaction(x)
-
+if __name__ == "__main__":
+    simulation()

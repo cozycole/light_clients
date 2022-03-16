@@ -88,7 +88,7 @@ class MerkleTree:
             return newNode
         left = self._generatetree(nodeSubSection[:split_id]) # call recursively on left "half"
         right = self._generatetree(nodeSubSection[split_id:]) # call recursively on right "half"
-        concatenated = str(int(left.get_value(),16) | int(right.get_value(),16))
+        concatenated = str(int(left.get_value(),16) + int(right.get_value(),16))
         value = sha1(concatenated.encode()).hexdigest()
         return MerkleNode(value, right, left, None)
 
