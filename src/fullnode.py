@@ -10,11 +10,17 @@ Holds the current blockchain as well as a method to verify transactions
 """
 import blockchain_structs as bs
 from merkle import MerkleTree
+import nipopow
+from typing import *
 
 
 class FullNode:
     def __init__(self, blockchain: bs.Blockchain) -> None:
         self.blockchain = blockchain
+        self.difficulty = None
+
+    def set_difficulty(self, difficulty: int):
+        self.difficulty = difficulty
     
     def get_path(self, tid: str):
         # Returns a dictionary with key pairs,
@@ -38,10 +44,16 @@ class FullNode:
                             "path" : mpath
                             }
             curblock = curblock.prev_block
-
-    def get_nipopow_proof():
-        pass
     
+    def get_nipopow_proof(self, k, m, txn):
+        if not nipopow.find_txn_block(self.blockchain, txn):
+            print(f"Transaction {txn} not found!")
+            return False
+        return nipopow.infix_proof(self.blockchain, k, m, self.difficulty, txn)
+
+    def get_top_chain(self, m: int, k: int, difficulty: int):
+        return nipopow.get_superchain(self.blockchain.chain, nipopow.find_top_chain(self.blockchain, m, difficulty, k), difficulty, k)
+
     def print_blockchain_transactions(self):
         # Prints the current block chain, for use in testing systems
         curblock = self.blockchain.head

@@ -58,10 +58,10 @@ def simulation():
     blocklen=input("How many blocks would you like the blockchain to contain:\n (for efficient speeds, stick to height of 10-30)\n$\t")
     coinbase=input("What would you like the coinbase to be:\n$\t")
     try:
-        chain = generate_blockchain(int(blocklen.strip()), int(coinbase.strip()), 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+        chain = generate_blockchain(int(blocklen.strip()), int(coinbase.strip()), 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
     except:
         print("Could Not Read transaction")
-        chain = generate_blockchain(8, 25, 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+        chain = generate_blockchain(8, 25, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
     fn = FullNode(chain)
     wallet = SPV(fn, chain.headers)
     valid_transaction = chain.head.prev_block.txs[2].tx_id
