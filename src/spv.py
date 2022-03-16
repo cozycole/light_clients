@@ -18,7 +18,16 @@ class SPV:
         self.headers = blockheaders # all headers in the blockchain
 
     def verify_transaction(self, tid):
-        # Calls full node to send a merkle path, and verifies the path itself
+        """
+        The verify_transaction method simulates a query to the full node ( which would usually be performed
+        via a network connection) to verify transaction of id: tid.  The full node returns the merkle path for 
+        that node if it is found.  The SPV module then “follows” this path by taking each value in the path and 
+        hashing it together with the hashed value of the transaction id.
+        
+        If the resulting value is the same as the value of the merkle root at headers[blockid], the 
+        transaction is verified and the method returns true, if not the method returns false.
+
+        """
         hashed = sha1(str(tid).encode()).hexdigest()
         fullnodeinfo = self.fullnode.get_path(tid)  # returns a dictionary with a block id and all transancations
         print("\n|SPV Wallet|")
@@ -46,7 +55,7 @@ def simulation():
     print("\n---------------------------------------------------------------------")
     print("Simple Payment Verification Simulation")
     print("---------------------------------------------------------------------\n")
-    blocklen=input("How many blocks would you like the blockchain to contain:\n$\t")
+    blocklen=input("How many blocks would you like the blockchain to contain:\n (for efficient speeds, stick to height of 10-30)\n$\t")
     coinbase=input("What would you like the coinbase to be:\n$\t")
     try:
         chain = generate_blockchain(int(blocklen.strip()), int(coinbase.strip()), 0x0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
@@ -86,5 +95,7 @@ def simulation():
             print("---------------------------------------------------------------------\n")
         else:
             wallet.verify_transaction(x)
+
+
 if __name__ == "__main__":
     simulation()
